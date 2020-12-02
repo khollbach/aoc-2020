@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# Usage, e.g.:
+# ./run_all
+# ./run_all --release
+
+set -e
+
+for i in $(seq 1 25); do
+    cd "$i"
+    cargo run "$@" < input
+    cd ..
+    echo
+done

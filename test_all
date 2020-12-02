@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# Usage, e.g.:
+# ./test_all
+# ./test_all --release
+
+set -e
+
+for i in $(seq 1 25); do
+    cd "$i"
+    cargo test "$@"
+    cd ..
+    echo
+done
