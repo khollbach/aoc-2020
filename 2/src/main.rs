@@ -26,7 +26,7 @@ fn read_input<R: BufRead>(input: R) -> Result<Vec<Row>, Box<dyn Error>> {
         let line = line?;
         let caps = re
             .captures(&line)
-            .expect(&format!("Invalid line: {}", line));
+            .ok_or_else(|| format!("Invalid line: {}", line))?;
 
         let a: usize = caps[1].parse()?;
         let b: usize = caps[2].parse()?;
