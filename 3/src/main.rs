@@ -23,7 +23,7 @@ fn part2(grid: &Grid) -> usize {
         Slope { right: 1, down: 2 },
     ];
     let ans = slopes.into_iter().map(|s| num_collisions(&grid, s));
-    ans.product::<usize>()
+    ans.product()
 }
 
 type Grid = Vec<Vec<Tile>>;
