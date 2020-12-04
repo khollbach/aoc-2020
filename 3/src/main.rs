@@ -5,18 +5,25 @@ use std::io::BufRead;
 fn main() {
     let grid = read_input(io::stdin().lock()).unwrap();
 
-    let slope = Slope { right: 3, down: 1 };
-    println!("{}", num_collisions(&grid, slope));
+    println!("{}", part1(&grid));
+    println!("{}", part2(&grid));
+}
 
+fn part1(grid: &Grid) -> usize {
+    let slope = Slope { right: 3, down: 1 };
+    num_collisions(&grid, slope)
+}
+
+fn part2(grid: &Grid) -> usize {
     let slopes = vec![
         Slope { right: 1, down: 1 },
-        slope,
+        Slope { right: 3, down: 1 },
         Slope { right: 5, down: 1 },
         Slope { right: 7, down: 1 },
         Slope { right: 1, down: 2 },
     ];
     let ans = slopes.into_iter().map(|s| num_collisions(&grid, s));
-    println!("{}", ans.product::<usize>());
+    ans.product::<usize>()
 }
 
 type Grid = Vec<Vec<Tile>>;
@@ -78,4 +85,27 @@ fn num_collisions(grid: &Grid, slope: Slope) -> usize {
     }
 
     collisions
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::fs::File;
+    use std::io::BufReader;
+
+    #[test]
+    fn part1() {
+        let input = BufReader::new(File::open("input").unwrap());
+        let grid = read_input(input).unwrap();
+
+        assert_eq!(super::part1(&grid), 234);
+    }
+
+    #[test]
+    fn part2() {
+        let input = BufReader::new(File::open("input").unwrap());
+        let grid = read_input(input).unwrap();
+
+        assert_eq!(super::part2(&grid), 5813773056);
+    }
 }
