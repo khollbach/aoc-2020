@@ -5,8 +5,18 @@ use std::io::BufRead;
 fn main() {
     let grid = read_input(io::stdin().lock()).unwrap();
 
-    let slope = Slope { down: 1, right: 3 };
+    let slope = Slope { right: 3, down: 1 };
     println!("{}", num_collisions(&grid, slope));
+
+    let slopes = vec![
+        Slope { right: 1, down: 1 },
+        slope,
+        Slope { right: 5, down: 1 },
+        Slope { right: 7, down: 1 },
+        Slope { right: 1, down: 2 },
+    ];
+    let ans = slopes.into_iter().map(|s| num_collisions(&grid, s));
+    println!("{}", ans.product::<usize>());
 }
 
 type Grid = Vec<Vec<Tile>>;
