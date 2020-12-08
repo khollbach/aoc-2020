@@ -54,7 +54,7 @@ def weighted_child_count(graph: dict, start_color: str) -> int:
     return dfs(start_color) - 1  # exclude start
 
 def main():
-    graph, back_edges = build_graph(open('input'))
+    graph, back_edges = build_graph(open('../inputs/7'))
     count = count_ancestors(back_edges, 'shiny gold')
     print(count)
     count = weighted_child_count(graph, 'shiny gold')
