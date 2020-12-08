@@ -4,66 +4,111 @@ use std::io::{self, prelude::*};
 type Res<T> = Result<T, Box<dyn Error>>;
 
 fn main() -> Res<()> {
-    let groups = read_input(io::stdin().lock())?;
-
-    let ans: Res<usize> = groups.iter().map(group_union_size).sum();
-    println!("{}", ans?);
-
-    let ans: Res<usize> = groups.iter().map(group_intersection_size).sum();
-    println!("{}", ans?);
-
+    let groups = read_input(io::stdin())?;
+    println!("{}", part1(&groups));
+    println!("{}", part2(&groups));
     Ok(())
 }
 
-type Group = Vec<String>;
+fn part1(groups: &[Group]) -> usize {
+    groups.iter().map(Group::union).map(|u| u.num_yeses()).sum()
+}
 
-fn read_input(mut input: impl Read) -> Res<Vec<Group>> {
-    let mut groups = vec![];
+fn part2(groups: &[Group]) -> usize {
+    groups
+        .iter()
+        .map(Group::intersection)
+        .map(|i| i.num_yeses())
+        .sum()
+}
 
+struct Person {
+    answers: [bool; 26],
+}
+
+struct Group {
+    people: Vec<Person>,
+}
+
+fn read_input<R: Read>(mut input: R) -> Res<Vec<Group>> {
     let mut buf = String::new();
     input.read_to_string(&mut buf)?;
 
+    let mut groups = vec![];
     for paragraph in buf.split("\n\n") {
-        let mut g = vec![];
-        for line in paragraph.split_whitespace() {
-            assert!(!line.is_empty());
-            g.push(line.into());
+        let mut people = vec![];
+        for line in paragraph.split('\n') {
+            let line = line.trim();
+            if !line.is_empty() {
+                people.push(Person::new(&line)?);
+            }
         }
-        groups.push(g);
+        groups.push(Group { people });
     }
-
     Ok(groups)
 }
 
-fn parse_answers(person: &str) -> Res<[bool; 26]> {
-    let mut answers = [false; 26];
-    for c in person.chars() {
-        if !('a'..='z').contains(&c) {
-            return Err(format!("Invalid char: {}", c).into());
+impl Person {
+    fn new(line: &str) -> Res<Person> {
+        let mut answers = [false; 26];
+        for c in line.chars() {
+            if !('a' <= c && c <= 'z') {
+                return Err(format!("Invalid char: {}", c).into());
+            }
+            let idx = c as usize - 'a' as usize;
+            answers[idx] = true;
         }
-        let idx = c as usize - 'a' as usize;
-        answers[idx] = true;
+        Ok(Person { answers })
     }
-    Ok(answers)
 }
 
-fn group_union_size(g: &Group) -> Res<usize> {
-    let mut answers = [false; 26];
-    for person in g {
-        for (i, &a) in parse_answers(&person)?.iter().enumerate() {
-            answers[i] |= a;
+impl Group {
+    fn union(&self) -> Person {
+        let mut answers = [false; 26];
+        for p in &self.people {
+            for (i, &a) in p.answers.iter().enumerate() {
+                answers[i] |= a;
+            }
         }
+        Person { answers }
     }
-    Ok(answers.iter().copied().filter(|&b| b).count())
+
+    fn intersection(&self) -> Person {
+        let mut answers = [true; 26];
+        for p in &self.people {
+            for (i, &a) in p.answers.iter().enumerate() {
+                answers[i] &= a;
+            }
+        }
+        Person { answers }
+    }
 }
 
-fn group_intersection_size(g: &Group) -> Res<usize> {
-    assert!(!g.is_empty());
-    let mut answers = [true; 26];
-    for person in g {
-        for (i, &a) in parse_answers(&person)?.iter().enumerate() {
-            answers[i] &= a;
-        }
+impl Person {
+    fn num_yeses(&self) -> usize {
+        self.answers.iter().filter(|&&b| b).count()
     }
-    Ok(answers.iter().copied().filter(|&b| b).count())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::fs::File;
+    use std::io::BufReader;
+
+    #[test]
+    fn part1() -> Res<()> {
+        let input = BufReader::new(File::open("input")?);
+        let groups = read_input(input)?;
+        assert_eq!(super::part1(&groups), 6775);
+        Ok(())
+    }
+
+    #[test]
+    fn part2() -> Res<()> {
+        let input = BufReader::new(File::open("input")?);
+        let groups = read_input(input)?;
+        assert_eq!(super::part2(&groups), 3356);
+        Ok(())
+    }
 }

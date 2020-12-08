@@ -1,49 +1,44 @@
 use std::collections::HashSet;
 use std::error::Error;
-use std::io;
-use std::io::BufRead;
+use std::io::{self, prelude::*};
 
-fn main() {
-    let nums = read_nums(io::stdin().lock()).unwrap();
+type Res<T> = Result<T, Box<dyn Error>>;
 
-    let (x, y) = two_sum(&nums, 2020).unwrap();
+fn main() -> Res<()> {
+    let nums = read_nums(io::stdin().lock())?;
+
+    let (x, y) = two_sum(&nums, 2020).expect("No solution");
     println!("{}", x * y);
 
-    let (x, y, z) = three_sum(&nums, 2020).unwrap();
+    let (x, y, z) = three_sum(&nums, 2020).expect("No solution");
     println!("{}", x * y * z);
+
+    Ok(())
 }
 
-fn read_nums<R: BufRead>(input: R) -> Result<Vec<i32>, Box<dyn Error>> {
+fn read_nums<R: BufRead>(input: R) -> Res<Vec<i32>> {
     let mut nums = vec![];
-
     for line in input.lines() {
-        let line = line?;
-
-        let n: i32 = line.parse()?;
+        let n: i32 = line?.parse()?;
         nums.push(n);
     }
-
     Ok(nums)
 }
 
 fn two_sum(nums: &[i32], target: i32) -> Option<(i32, i32)> {
     let mut seen = HashSet::new();
-
     for &x in nums {
         let y = target - x;
         if seen.contains(&y) {
             return Some((y, x));
         }
-
         seen.insert(x);
     }
-
     None
 }
 
 fn three_sum(nums: &[i32], target: i32) -> Option<(i32, i32, i32)> {
     let mut seen = HashSet::new();
-
     for (i, &x) in nums.iter().enumerate() {
         for &y in nums.iter().skip(i + 1) {
             let z = target - x - y;
@@ -51,10 +46,8 @@ fn three_sum(nums: &[i32], target: i32) -> Option<(i32, i32, i32)> {
                 return Some((z, x, y));
             }
         }
-
         seen.insert(x);
     }
-
     None
 }
 
@@ -65,20 +58,22 @@ mod tests {
     use std::io::BufReader;
 
     #[test]
-    fn part1() {
-        let input = BufReader::new(File::open("input").unwrap());
-        let nums = read_nums(input).unwrap();
+    fn part1() -> Res<()> {
+        let input = BufReader::new(File::open("input")?);
+        let nums = read_nums(input)?;
 
         let (x, y) = two_sum(&nums, 2020).unwrap();
         assert_eq!(x * y, 731731);
+        Ok(())
     }
 
     #[test]
-    fn part2() {
-        let input = BufReader::new(File::open("input").unwrap());
-        let nums = read_nums(input).unwrap();
+    fn part2() -> Res<()> {
+        let input = BufReader::new(File::open("input")?);
+        let nums = read_nums(input)?;
 
         let (x, y, z) = three_sum(&nums, 2020).unwrap();
         assert_eq!(x * y * z, 116115990);
+        Ok(())
     }
 }

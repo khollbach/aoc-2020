@@ -10,7 +10,7 @@ def build_graph(lines: Iterable[str]) -> (dict, dict):
     back_edges = defaultdict(dict)
 
     for line in lines:
-        color, edges = re.match(r'^(.*) bags contain (.*).\n?$', line).groups()
+        color, edges = re.match(r'^(.*) bags contain (.*)\.\n?$', line).groups()
 
         if edges == 'no other bags':
             continue
@@ -28,31 +28,36 @@ def count_ancestors(back_edges: dict, start_color: str) -> int:
     seen = set()
     def dfs(color):
         seen.add(color)
-        for nbr in back_edges[color]:
-            if nbr not in seen:
-                dfs(nbr)
+        for neighbour in back_edges[color]:
+            if neighbour not in seen:
+                dfs(neighbour)
 
     dfs(start_color)
     return len(seen) - 1  # exclude start_color
 
 def weighted_child_count(graph: dict, start_color: str) -> int:
-    seen = set()
+    # This is the set of nodes on the path from the start node to the current
+    # node. We use it to detect cycles.
+    current_path = set()
+
     def dfs(color) -> int:
-        seen.add(color)
+        current_path.add(color)
+
         total = 1  # self
-        for (nbr, weight) in graph[color].items():
-            assert nbr not in seen
-            total += weight * dfs(nbr)
-        seen.remove(color)
+        for (neighbour, weight) in graph[color].items():
+            assert neighbour not in current_path
+            total += weight * dfs(neighbour)
+
+        current_path.remove(color)
         return total
 
     return dfs(start_color) - 1  # exclude start
 
 def main():
-    g, b = build_graph(open('input'))
-    count = count_ancestors(b, 'shiny gold')
+    graph, back_edges = build_graph(open('input'))
+    count = count_ancestors(back_edges, 'shiny gold')
     print(count)
-    count = weighted_child_count(g, 'shiny gold')
+    count = weighted_child_count(graph, 'shiny gold')
     print(count)
 
 if __name__ == '__main__':

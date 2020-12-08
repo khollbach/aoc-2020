@@ -6,10 +6,10 @@ type Res<T> = Result<T, Box<dyn Error>>;
 fn main() -> Res<()> {
     let nums = read_input(io::stdin().lock())?;
 
-    let max = nums.iter().max().unwrap();
+    let max = nums.iter().max().expect("Empty input");
     println!("{}", max);
 
-    let missing = find_missing(nums).unwrap();
+    let missing = find_missing(nums).expect("Empty input");
     println!("{}", missing);
 
     Ok(())
@@ -18,8 +18,7 @@ fn main() -> Res<()> {
 fn read_input(input: impl BufRead) -> Res<Vec<u32>> {
     let mut nums = vec![];
     for line in input.lines() {
-        let line = line?;
-        nums.push(parse_num(&line)?);
+        nums.push(parse_num(&line?)?);
     }
     Ok(nums)
 }
@@ -34,15 +33,14 @@ fn parse_num(bsp_code: &str) -> Res<u32> {
             'R' => 1,
             _ => return Err(format!("Invalid char: {}", c).into()),
         };
-        acc |= bit;
         acc <<= 1;
+        acc |= bit;
     }
-    acc >>= 1;
     Ok(acc)
 }
 
 fn find_missing(mut nums: Vec<u32>) -> Option<u32> {
-    nums.sort_unstable();
+    nums.sort();
     for i in 1..nums.len() {
         let prev = nums[i - 1];
         let curr = nums[i];
@@ -51,4 +49,29 @@ fn find_missing(mut nums: Vec<u32>) -> Option<u32> {
         }
     }
     None
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::fs::File;
+    use std::io::BufReader;
+
+    #[test]
+    fn part1() -> Res<()> {
+        let input = BufReader::new(File::open("input")?);
+        let nums = read_input(input)?;
+        let max = nums.into_iter().max().unwrap();
+        assert_eq!(max, 816);
+        Ok(())
+    }
+
+    #[test]
+    fn part2() -> Res<()> {
+        let input = BufReader::new(File::open("input")?);
+        let nums = read_input(input)?;
+        let missing = find_missing(nums).unwrap();
+        assert_eq!(missing, 539);
+        Ok(())
+    }
 }
