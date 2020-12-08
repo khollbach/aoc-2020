@@ -108,7 +108,7 @@ mod tests {
 
     #[test]
     fn part1() -> Res<()> {
-        let input = BufReader::new(File::open("input")?);
+        let input = BufReader::new(File::open("../../inputs/4")?);
         let passports = read_input(input)?;
         assert_eq!(num_valid(&passports, false), 245);
         Ok(())
@@ -116,7 +116,7 @@ mod tests {
 
     #[test]
     fn part2() -> Res<()> {
-        let input = BufReader::new(File::open("input")?);
+        let input = BufReader::new(File::open("../../inputs/4")?);
         let passports = read_input(input)?;
         assert_eq!(num_valid(&passports, true), 133);
         Ok(())

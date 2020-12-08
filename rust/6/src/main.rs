@@ -98,7 +98,7 @@ mod tests {
 
     #[test]
     fn part1() -> Res<()> {
-        let input = BufReader::new(File::open("input")?);
+        let input = BufReader::new(File::open("../../inputs/6")?);
         let groups = read_input(input)?;
         assert_eq!(super::part1(&groups), 6775);
         Ok(())
@@ -106,7 +106,7 @@ mod tests {
 
     #[test]
     fn part2() -> Res<()> {
-        let input = BufReader::new(File::open("input")?);
+        let input = BufReader::new(File::open("../../inputs/6")?);
         let groups = read_input(input)?;
         assert_eq!(super::part2(&groups), 3356);
         Ok(())

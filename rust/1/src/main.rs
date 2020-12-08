@@ -59,7 +59,7 @@ mod tests {
 
     #[test]
     fn part1() -> Res<()> {
-        let input = BufReader::new(File::open("input")?);
+        let input = BufReader::new(File::open("../../inputs/1")?);
         let nums = read_nums(input)?;
 
         let (x, y) = two_sum(&nums, 2020).unwrap();
@@ -69,7 +69,7 @@ mod tests {
 
     #[test]
     fn part2() -> Res<()> {
-        let input = BufReader::new(File::open("input")?);
+        let input = BufReader::new(File::open("../../inputs/1")?);
         let nums = read_nums(input)?;
 
         let (x, y, z) = three_sum(&nums, 2020).unwrap();

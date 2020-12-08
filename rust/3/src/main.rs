@@ -95,7 +95,7 @@ mod tests {
 
     #[test]
     fn part1() -> Res<()> {
-        let input = BufReader::new(File::open("input")?);
+        let input = BufReader::new(File::open("../../inputs/3")?);
         let grid = read_input(input)?;
         assert_eq!(super::part1(&grid), 234);
         Ok(())
@@ -103,7 +103,7 @@ mod tests {
 
     #[test]
     fn part2() -> Res<()> {
-        let input = BufReader::new(File::open("input")?);
+        let input = BufReader::new(File::open("../../inputs/3")?);
         let grid = read_input(input)?;
         assert_eq!(super::part2(&grid), 5813773056);
         Ok(())

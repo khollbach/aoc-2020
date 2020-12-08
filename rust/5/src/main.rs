@@ -59,7 +59,7 @@ mod tests {
 
     #[test]
     fn part1() -> Res<()> {
-        let input = BufReader::new(File::open("input")?);
+        let input = BufReader::new(File::open("../../inputs/5")?);
         let nums = read_input(input)?;
         let max = nums.into_iter().max().unwrap();
         assert_eq!(max, 816);
@@ -68,7 +68,7 @@ mod tests {
 
     #[test]
     fn part2() -> Res<()> {
-        let input = BufReader::new(File::open("input")?);
+        let input = BufReader::new(File::open("../../inputs/5")?);
         let nums = read_input(input)?;
         let missing = find_missing(nums).unwrap();
         assert_eq!(missing, 539);
