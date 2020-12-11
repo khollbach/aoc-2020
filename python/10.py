@@ -19,7 +19,7 @@ def part1(nums: List[int]) -> int:
     diffs = map(sub, zip(nums[1:], nums[:-1]))
 
     freqs = Counter(diffs)
-    assert len(freqs) <= 3
+    assert max(freqs) <= 3
     assert 0 not in freqs  # nums should be unique for part 2.
     return freqs[1] * freqs[3]
 

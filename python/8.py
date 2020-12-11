@@ -9,7 +9,7 @@ Instr = recordclass('Instr', 'op arg')
 def main():
     code: List[Instr] = []
     for line in open('../inputs/8'):
-        op, arg = line.strip().split()
+        op, arg = line.split()
         assert op in 'acc jmp nop'.split()
         code.append(Instr(op, int(arg)))
 
@@ -39,6 +39,7 @@ def main():
         except InfiniteLoop:
             pass
         finally:
+            # Flip it back.
             flip(code[i])
 
     assert ans is not None
@@ -55,7 +56,7 @@ def run(code: List[Instr]) -> int:
     seen = set()
 
     i = 0
-    while i < len(code):
+    while 0 <= i < len(code):
         if i in seen:
             raise InfiniteLoop(i, acc)
 
@@ -64,16 +65,15 @@ def run(code: List[Instr]) -> int:
 
         if op == 'jmp':
             i += arg
-            continue
-
-        if op == 'acc':
+        elif op == 'acc':
             acc += arg
+            i += 1
         elif op == 'nop':
-            pass
+            i += 1
         else:
             assert False, 'Not an operation {}'.format(op)
 
-        i += 1
+    assert i == len(code)
 
     return acc
 

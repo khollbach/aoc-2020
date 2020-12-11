@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-day1 = __import__('1')
+day1 = __import__('1')  # Import 1.py
 
 def main():
     nums = list(map(int, open('../inputs/9')))
@@ -14,6 +14,7 @@ def main():
     print(invalid_num)
 
     range_ = contiguous_sum(nums, invalid_num)
+    assert range_ is not None, 'No range found'
     print(min(range_) + max(range_))
 
 def contiguous_sum(nums: List[int], target: int) -> Optional[List[int]]:
@@ -28,7 +29,8 @@ def contiguous_sum(nums: List[int], target: int) -> Optional[List[int]]:
         if window_sum == target:
             return nums[lo:hi]
         elif window_sum < target:
-            if hi >= len(nums):
+            if hi == len(nums):
+                # List exausted, no slice found that sums to target.
                 return None
             window_sum += nums[hi]
             hi += 1
