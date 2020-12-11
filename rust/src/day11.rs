@@ -151,3 +151,26 @@ impl State {
         self.grid.iter().map(|r| row_count(r)).sum()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::fs::File;
+    use std::io::BufReader;
+
+    #[test]
+    fn part1() -> Res<()> {
+        let input = BufReader::new(File::open("../inputs/11")?);
+        let initial_state = State::from_input(input)?;
+        assert_eq!(final_num_ppl(initial_state, false), 2319);
+        Ok(())
+    }
+
+    #[test]
+    fn part2() -> Res<()> {
+        let input = BufReader::new(File::open("../inputs/11")?);
+        let initial_state = State::from_input(input)?;
+        assert_eq!(final_num_ppl(initial_state, true), 2117);
+        Ok(())
+    }
+}
