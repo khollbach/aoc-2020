@@ -7,8 +7,6 @@
 set -e
 
 for i in $(seq 1 25); do
-    cd "$i"
-    cargo run "$@" < ../../inputs/"$i"
-    cd ..
+    cargo run "$@" "$i" < ../inputs/"$i"
     echo
 done

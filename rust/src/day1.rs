@@ -1,10 +1,8 @@
+use super::Res;
 use std::collections::HashSet;
-use std::error::Error;
 use std::io::{self, prelude::*};
 
-type Res<T> = Result<T, Box<dyn Error>>;
-
-fn main() -> Res<()> {
+pub fn main() -> Res<()> {
     let nums = read_nums(io::stdin().lock())?;
 
     let (x, y) = two_sum(&nums, 2020).expect("No solution");
@@ -59,7 +57,7 @@ mod tests {
 
     #[test]
     fn part1() -> Res<()> {
-        let input = BufReader::new(File::open("../../inputs/1")?);
+        let input = BufReader::new(File::open("../inputs/1")?);
         let nums = read_nums(input)?;
 
         let (x, y) = two_sum(&nums, 2020).unwrap();
@@ -69,7 +67,7 @@ mod tests {
 
     #[test]
     fn part2() -> Res<()> {
-        let input = BufReader::new(File::open("../../inputs/1")?);
+        let input = BufReader::new(File::open("../inputs/1")?);
         let nums = read_nums(input)?;
 
         let (x, y, z) = three_sum(&nums, 2020).unwrap();

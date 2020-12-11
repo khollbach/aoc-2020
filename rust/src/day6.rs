@@ -1,9 +1,7 @@
-use std::error::Error;
+use super::Res;
 use std::io::{self, prelude::*};
 
-type Res<T> = Result<T, Box<dyn Error>>;
-
-fn main() -> Res<()> {
+pub fn main() -> Res<()> {
     let groups = read_input(io::stdin())?;
     println!("{}", part1(&groups));
     println!("{}", part2(&groups));
@@ -98,7 +96,7 @@ mod tests {
 
     #[test]
     fn part1() -> Res<()> {
-        let input = BufReader::new(File::open("../../inputs/6")?);
+        let input = BufReader::new(File::open("../inputs/6")?);
         let groups = read_input(input)?;
         assert_eq!(super::part1(&groups), 6775);
         Ok(())
@@ -106,7 +104,7 @@ mod tests {
 
     #[test]
     fn part2() -> Res<()> {
-        let input = BufReader::new(File::open("../../inputs/6")?);
+        let input = BufReader::new(File::open("../inputs/6")?);
         let groups = read_input(input)?;
         assert_eq!(super::part2(&groups), 3356);
         Ok(())

@@ -1,10 +1,8 @@
+use super::Res;
 use regex::Regex;
-use std::error::Error;
 use std::io::{self, prelude::*};
 
-type Res<T> = Result<T, Box<dyn Error>>;
-
-fn main() -> Res<()> {
+pub fn main() -> Res<()> {
     let input = read_input(io::stdin().lock())?;
     println!("{}", count_valid(&input, Row::policy1));
     println!("{}", count_valid(&input, Row::policy2));
@@ -79,7 +77,7 @@ mod tests {
 
     #[test]
     fn part1() -> Res<()> {
-        let input = BufReader::new(File::open("../../inputs/2")?);
+        let input = BufReader::new(File::open("../inputs/2")?);
         let input = read_input(input)?;
         assert_eq!(count_valid(&input, Row::policy1), 416);
         Ok(())
@@ -87,7 +85,7 @@ mod tests {
 
     #[test]
     fn part2() -> Res<()> {
-        let input = BufReader::new(File::open("../../inputs/2")?);
+        let input = BufReader::new(File::open("../inputs/2")?);
         let input = read_input(input)?;
         assert_eq!(count_valid(&input, Row::policy2), 688);
         Ok(())

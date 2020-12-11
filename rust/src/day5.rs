@@ -1,9 +1,7 @@
-use std::error::Error;
+use super::Res;
 use std::io::{self, prelude::*};
 
-type Res<T> = Result<T, Box<dyn Error>>;
-
-fn main() -> Res<()> {
+pub fn main() -> Res<()> {
     let nums = read_input(io::stdin().lock())?;
 
     let max = nums.iter().max().expect("Empty input");
@@ -59,7 +57,7 @@ mod tests {
 
     #[test]
     fn part1() -> Res<()> {
-        let input = BufReader::new(File::open("../../inputs/5")?);
+        let input = BufReader::new(File::open("../inputs/5")?);
         let nums = read_input(input)?;
         let max = nums.into_iter().max().unwrap();
         assert_eq!(max, 816);
@@ -68,7 +66,7 @@ mod tests {
 
     #[test]
     fn part2() -> Res<()> {
-        let input = BufReader::new(File::open("../../inputs/5")?);
+        let input = BufReader::new(File::open("../inputs/5")?);
         let nums = read_input(input)?;
         let missing = find_missing(nums).unwrap();
         assert_eq!(missing, 539);

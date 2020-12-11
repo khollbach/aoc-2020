@@ -1,11 +1,9 @@
+use super::Res;
 use regex::Regex;
 use std::collections::HashMap;
-use std::error::Error;
 use std::io::{self, prelude::*};
 
-type Res<T> = Result<T, Box<dyn Error>>;
-
-fn main() -> Res<()> {
+pub fn main() -> Res<()> {
     let passports = read_input(io::stdin())?;
     println!("{}", num_valid(&passports, false));
     println!("{}", num_valid(&passports, true));
@@ -108,7 +106,7 @@ mod tests {
 
     #[test]
     fn part1() -> Res<()> {
-        let input = BufReader::new(File::open("../../inputs/4")?);
+        let input = BufReader::new(File::open("../inputs/4")?);
         let passports = read_input(input)?;
         assert_eq!(num_valid(&passports, false), 245);
         Ok(())
@@ -116,7 +114,7 @@ mod tests {
 
     #[test]
     fn part2() -> Res<()> {
-        let input = BufReader::new(File::open("../../inputs/4")?);
+        let input = BufReader::new(File::open("../inputs/4")?);
         let passports = read_input(input)?;
         assert_eq!(num_valid(&passports, true), 133);
         Ok(())

@@ -1,9 +1,7 @@
-use std::error::Error;
+use super::Res;
 use std::io::{self, prelude::*};
 
-type Res<T> = Result<T, Box<dyn Error>>;
-
-fn main() -> Res<()> {
+pub fn main() -> Res<()> {
     let grid = read_input(io::stdin().lock())?;
     println!("{}", part1(&grid));
     println!("{}", part2(&grid));
@@ -95,7 +93,7 @@ mod tests {
 
     #[test]
     fn part1() -> Res<()> {
-        let input = BufReader::new(File::open("../../inputs/3")?);
+        let input = BufReader::new(File::open("../inputs/3")?);
         let grid = read_input(input)?;
         assert_eq!(super::part1(&grid), 234);
         Ok(())
@@ -103,7 +101,7 @@ mod tests {
 
     #[test]
     fn part2() -> Res<()> {
-        let input = BufReader::new(File::open("../../inputs/3")?);
+        let input = BufReader::new(File::open("../inputs/3")?);
         let grid = read_input(input)?;
         assert_eq!(super::part2(&grid), 5813773056);
         Ok(())
