@@ -1,4 +1,5 @@
 use super::Res;
+use lazy_static::lazy_static;
 use regex::Regex;
 use std::collections::HashMap;
 use std::io::{self, prelude::*};
@@ -10,12 +11,18 @@ pub fn main() -> Res<()> {
     Ok(())
 }
 
+fn num_valid(passports: &[Passport], strict: bool) -> usize {
+    passports.iter().filter(|&p| p.is_valid(strict)).count()
+}
+
 struct Passport {
     fields: HashMap<String, String>,
 }
 
 fn read_input<R: Read>(mut input: R) -> Res<Vec<Passport>> {
-    let re = Regex::new(r"^(.+):(.+)$").unwrap();
+    lazy_static! {
+        static ref WORD_RE: Regex = Regex::new(r"^(.+):(.+)$").unwrap();
+    }
 
     let mut buf = String::new();
     input.read_to_string(&mut buf)?;
@@ -24,7 +31,7 @@ fn read_input<R: Read>(mut input: R) -> Res<Vec<Passport>> {
     for paragraph in buf.split("\n\n") {
         let mut fields = HashMap::new();
         for word in paragraph.split_whitespace() {
-            let caps = match re.captures(word) {
+            let caps = match WORD_RE.captures(word) {
                 Some(c) => c,
                 None => return Err(format!("Invalid entry: {}", word).into()),
             };
@@ -43,6 +50,10 @@ fn read_input<R: Read>(mut input: R) -> Res<Vec<Passport>> {
 impl Passport {
     const REQ_FIELDS: [&'static str; 7] = ["byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"];
 
+    fn is_valid(&self, strict: bool) -> bool {
+        self.has_req_fields() && (!strict || self.entries_are_valid())
+    }
+
     fn has_req_fields(&self) -> bool {
         Self::REQ_FIELDS
             .iter()
@@ -53,11 +64,14 @@ impl Passport {
         self.fields.iter().all(|(k, v)| Self::is_valid_entry(k, v))
     }
 
-    fn is_valid(&self, strict: bool) -> bool {
-        self.has_req_fields() && (!strict || self.entries_are_valid())
-    }
-
     fn is_valid_entry(key: &str, val: &str) -> bool {
+        lazy_static! {
+            static ref CM_RE: Regex = Regex::new(r"^(\d+)cm$").unwrap();
+            static ref IN_RE: Regex = Regex::new(r"^(\d+)in$").unwrap();
+            static ref HCL_RE: Regex = Regex::new(r"^#[0-9a-f]{6}$").unwrap();
+            static ref PID_RE: Regex = Regex::new(r"^[0-9]{9}$").unwrap();
+        }
+
         fn is_in_range(v: &str, low: u32, high: u32) -> bool {
             match v.parse() {
                 Ok(n) => (low..=high).contains(&n),
@@ -75,27 +89,23 @@ impl Passport {
             "iyr" => range_4_digits(val, 2010, 2020),
             "eyr" => range_4_digits(val, 2020, 2030),
             "hgt" => {
-                if let Some(caps) = Regex::new(r"^(\d+)cm$").unwrap().captures(val) {
+                if let Some(caps) = CM_RE.captures(val) {
                     is_in_range(&caps[1], 150, 193)
-                } else if let Some(caps) = Regex::new(r"^(\d+)in$").unwrap().captures(val) {
+                } else if let Some(caps) = IN_RE.captures(val) {
                     is_in_range(&caps[1], 59, 76)
                 } else {
                     false
                 }
             }
-            "hcl" => Regex::new(r"^#[0-9a-f]{6}$").unwrap().is_match(val),
+            "hcl" => HCL_RE.is_match(val),
             "ecl" => match val {
                 "amb" | "blu" | "brn" | "gry" | "grn" | "hzl" | "oth" => true,
                 _ => false,
             },
-            "pid" => Regex::new(r"^[0-9]{9}$").unwrap().is_match(val),
+            "pid" => PID_RE.is_match(val),
             _ => false,
         }
     }
-}
-
-fn num_valid(passports: &[Passport], strict: bool) -> usize {
-    passports.iter().filter(|&p| p.is_valid(strict)).count()
 }
 
 #[cfg(test)]
