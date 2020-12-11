@@ -4,18 +4,17 @@ use std::mem;
 
 pub fn main() -> Res<()> {
     let initial_state = State::from_input(io::stdin().lock())?;
-
-    println!("{}", part1(initial_state));
-
+    println!("{}", final_num_ppl(initial_state.clone(), false));
+    println!("{}", final_num_ppl(initial_state, true));
     Ok(())
 }
 
-fn part1(initial_state: State) -> usize {
+fn final_num_ppl(initial_state: State, part2: bool) -> usize {
     let mut state = initial_state;
     let mut buf = state.clone();
     loop {
         // Compute next state.
-        state.evolve(&mut buf);
+        state.evolve(&mut buf, part2);
 
         if buf == state {
             return state.num_occupied();
@@ -74,17 +73,23 @@ impl State {
         (n, m)
     }
 
-    fn evolve(&self, output_buf: &mut State) {
+    fn evolve(&self, output_buf: &mut State, part2: bool) {
         let (n, m) = self.dimensions();
         assert_eq!(output_buf.dimensions(), (n, m));
 
         for i in 0..n {
             for j in 0..m {
                 let tile = self.grid[i][j];
-                let num_adj = self.adj_people(i, j);
-                let new_tile = match (tile, num_adj) {
+                let nearby = if part2 {
+                    self.visible_people(i, j)
+                } else {
+                    self.adj_people(i, j)
+                };
+                let thresh = if part2 { 5 } else { 4 };
+
+                let new_tile = match (tile, nearby) {
                     (Tile::Chair, 0) => Tile::Person,
-                    (Tile::Person, n) if n >= 4 => Tile::Chair,
+                    (Tile::Person, n) if n >= thresh => Tile::Chair,
                     _ => tile,
                 };
                 output_buf.grid[i][j] = new_tile;
@@ -93,6 +98,14 @@ impl State {
     }
 
     fn adj_people(&self, i: usize, j: usize) -> u8 {
+        self.vis_ppl_helper(i, j, 1)
+    }
+
+    fn visible_people(&self, i: usize, j: usize) -> u8 {
+        self.vis_ppl_helper(i, j, usize::MAX)
+    }
+
+    fn vis_ppl_helper(&self, i: usize, j: usize, dist_limit: usize) -> u8 {
         let (n, m) = self.dimensions();
         assert!(i < n && j < m);
 
@@ -102,16 +115,28 @@ impl State {
         let n = n as isize;
         let m = m as isize;
 
+        // Returns the first visible tile in a direction.
+        // Visibility is limited by `dist_limit`.
+        let line_of_sight = |i, j, di, dj| -> Option<Tile> {
+            let mut r = i + di;
+            let mut c = j + dj;
+            let mut dist = 1;
+            while dist <= dist_limit && (0 <= r && r < n) && (0 <= c && c < m) {
+                let tile = self.grid[r as usize][c as usize];
+                if tile != Tile::Floor {
+                    return Some(tile);
+                }
+                r += di;
+                c += dj;
+                dist += 1;
+            }
+            None
+        };
+
         let mut count = 0;
         for &di in &[-1, 0, 1] {
             for &dj in &[-1, 0, 1] {
-                let r = i + di;
-                let c = j + dj;
-                if (r, c) != (i, j)
-                    && (0 <= r && r < n)
-                    && (0 <= c && c < m)
-                    && self.grid[r as usize][c as usize] == Tile::Person
-                {
+                if (di, dj) != (0, 0) && line_of_sight(i, j, di, dj) == Some(Tile::Person) {
                     count += 1;
                 }
             }
