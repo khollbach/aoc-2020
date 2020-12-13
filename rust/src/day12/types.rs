@@ -1,6 +1,7 @@
 use crate::Res;
 use std::io::prelude::*;
 
+#[derive(Clone, Copy)]
 pub struct Point {
     pub x: i32,
     pub y: i32,
@@ -101,7 +102,7 @@ impl Rotation {
 #[derive(Clone, Copy)]
 pub enum Action {
     Forward(u32),
-    Direct(Dir, u32),
+    Translate(Dir, u32),
     Rotate(Rotation),
 }
 
@@ -111,7 +112,7 @@ impl Action {
         if c == 'F' {
             return Ok(Forward(n));
         } else if let Some(d) = Dir::new(c) {
-            return Ok(Direct(d, n));
+            return Ok(Translate(d, n));
         } else {
             Ok(Rotate(Rotation::new(c, n)?))
         }
