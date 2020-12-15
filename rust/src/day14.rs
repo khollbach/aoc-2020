@@ -4,7 +4,6 @@ use regex::Regex;
 use std::collections::HashMap;
 use std::io::{self, prelude::*};
 
-// todo: this works on the example, but I get "wrong answer; too high" on the actual input...
 pub fn main() -> Res<()> {
     let program = read_input(io::stdin().lock())?;
     println!("{}", run(&program));
@@ -39,7 +38,7 @@ pub fn run(program: &[Statement]) -> u64 {
     mem.values().sum()
 }
 
-#[derive(Clone, Copy)]
+#[derive(Debug, Clone, Copy)]
 pub enum Statement {
     Mask(Mask),
     Assign { addr: u64, val: u64 },
@@ -48,7 +47,7 @@ pub enum Statement {
 /// E.g.,   XXXX11X0X1 becomes
 /// ones:  b0000110001
 /// zeros: b0000000100
-#[derive(Clone, Copy)]
+#[derive(Debug, Clone, Copy)]
 pub struct Mask {
     ones: u64,
     zeros: u64,
@@ -59,8 +58,10 @@ impl Mask {
         Mask { ones: 0, zeros: 0 }
     }
 
-    fn apply(self, val: u64) -> u64 {
-        val | self.ones & !self.zeros
+    fn apply(self, mut val: u64) -> u64 {
+        val |= self.ones;
+        val &= !self.zeros;
+        val
     }
 }
 
