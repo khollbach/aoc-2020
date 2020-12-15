@@ -11,17 +11,17 @@ pub fn main() -> Res<()> {
 
 fn final_num_ppl(initial_state: State, part2: bool) -> usize {
     let mut state = initial_state;
-    let mut buf = state.clone();
+    let mut next_state = state.clone();
     loop {
         // Compute next state.
-        state.evolve(&mut buf, part2);
+        state.evolve(&mut next_state, part2);
 
-        if buf == state {
-            return state.num_occupied();
+        if next_state == state {
+            return state.total_num_ppl();
         }
 
         // Update state.
-        mem::swap(&mut state, &mut buf);
+        mem::swap(&mut state, &mut next_state);
     }
 }
 
@@ -56,7 +56,7 @@ impl State {
             let row: Vec<_> = row?;
             if i != 0 && row.len() != grid[0].len() {
                 return Err(format!(
-                    "Non-rectangular grid: row lengths {} and {}",
+                    "Jagged grid: row lengths {} and {}",
                     grid[0].len(),
                     row.len()
                 )
@@ -80,14 +80,14 @@ impl State {
         for i in 0..n {
             for j in 0..m {
                 let tile = self.grid[i][j];
-                let nearby = if part2 {
+                let nearby_ppl = if part2 {
                     self.visible_people(i, j)
                 } else {
                     self.adj_people(i, j)
                 };
                 let thresh = if part2 { 5 } else { 4 };
 
-                let new_tile = match (tile, nearby) {
+                let new_tile = match (tile, nearby_ppl) {
                     (Tile::Chair, 0) => Tile::Person,
                     (Tile::Person, n) if n >= thresh => Tile::Chair,
                     _ => tile,
@@ -144,7 +144,7 @@ impl State {
         count
     }
 
-    fn num_occupied(&self) -> usize {
+    fn total_num_ppl(&self) -> usize {
         fn row_count(row: &[Tile]) -> usize {
             row.iter().filter(|&&t| t == Tile::Person).count()
         }
