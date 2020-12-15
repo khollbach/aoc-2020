@@ -50,17 +50,17 @@ pub enum Statement {
 /// zeros: b0000000100
 #[derive(Debug, Clone)]
 pub struct Mask {
-    mask: String,
     ones: u64,
     zeros: u64,
+    xs: Vec<usize>,
 }
 
 impl Mask {
     fn empty() -> Mask {
         Mask {
-            mask: String::new(),
             ones: 0,
             zeros: 0,
+            xs: vec![],
         }
     }
 
@@ -70,36 +70,35 @@ impl Mask {
         val
     }
 
-    fn decode_addr(&self, addr: u64) -> Vec<u64> {
-        assert!(!self.mask.is_empty());
-        Self::decode_helper(&self.mask, addr)
+    fn decode_addr(&self, mut addr: u64) -> Vec<u64> {
+        addr |= self.ones;
+
+        Self::powerset(&self.xs)
+            .iter()
+            .map(|mask| mask.apply(addr))
+            .collect()
     }
 
-    fn decode_helper(mask: &str, addr: u64) -> Vec<u64> {
-        if mask.is_empty() {
-            return vec![0];
+    fn powerset(xs: &[usize]) -> Vec<Mask> {
+        if xs.is_empty() {
+            return vec![Mask::empty()];
         }
-        let n = mask.len();
 
-        let mut prefix = 0;
-        for (offset, c) in mask.chars().enumerate() {
-            let i = n - 1 - offset;
-            let bit = 1 << i;
-            match c {
-                '0' => prefix |= addr & bit,
-                '1' => prefix |= bit,
-                'X' => {
-                    let mut res = vec![];
-                    for suffix in Self::decode_helper(&mask[offset + 1..], addr) {
-                        res.push(prefix | suffix); // 0
-                        res.push(prefix | bit | suffix); // 1
-                    }
-                    return res;
-                }
-                _ => panic!("Invalid char in mask: {}", c),
-            }
+        let mut masks = Vec::with_capacity(2_usize.pow(xs.len() as u32));
+
+        for m in Self::powerset(&xs[1..]) {
+            let bit = 1 << xs[0];
+
+            let mut m0 = m.clone();
+            m0.zeros |= bit;
+            masks.push(m0);
+
+            let mut m1 = m;
+            m1.ones |= bit;
+            masks.push(m1);
         }
-        vec![prefix]
+
+        masks
     }
 }
 
@@ -137,11 +136,12 @@ impl Mask {
 
         let mut ones = 0;
         let mut zeros = 0;
+        let mut xs = vec![];
 
         // Reading from right to left.
         for (i, c) in mask.chars().rev().enumerate() {
             match c {
-                'X' => (),
+                'X' => xs.push(i),
                 '0' => zeros |= 1 << i,
                 '1' => ones |= 1 << i,
                 _ => panic!("Invalid char in mask: {}", c),
@@ -149,11 +149,7 @@ impl Mask {
         }
         debug_assert_eq!(ones & zeros, 0);
 
-        Mask {
-            zeros,
-            ones,
-            mask: String::from(mask),
-        }
+        Mask { zeros, ones, xs }
     }
 }
 
