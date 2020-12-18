@@ -17,7 +17,7 @@ mod day13;
 mod day14;
 mod day15;
 //mod day16;
-//mod day17;
+mod day17;
 //mod day18;
 //mod day19;
 //mod day20;
@@ -48,7 +48,7 @@ pub fn solution(day: u32) -> Res<()> {
         14 => day14::main(),
         15 => day15::main(),
         //16 => day16::main(),
-        //17 => day17::main(),
+        17 => day17::main(),
         //18 => day18::main(),
         //19 => day19::main(),
         //20 => day20::main(),
