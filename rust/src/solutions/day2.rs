@@ -1,4 +1,4 @@
-use super::Res;
+use crate::Res;
 use regex::Regex;
 use std::io::{self, prelude::*};
 

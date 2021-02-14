@@ -1,4 +1,4 @@
-use super::Res;
+use crate::Res;
 use input::{Constraint, Input};
 use std::collections::HashMap;
 use std::io;

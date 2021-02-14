@@ -1,4 +1,4 @@
-use super::Res;
+use crate::Res;
 use std::io;
 use types::Action::{self, Forward, Rotate, Translate};
 use types::{Direction, Point};

@@ -1,4 +1,4 @@
-use super::Res;
+use crate::Res;
 use std::collections::HashMap;
 
 pub fn main() -> Res<()> {

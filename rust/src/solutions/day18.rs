@@ -1,4 +1,4 @@
-use super::Res;
+use crate::Res;
 use std::io::{self, prelude::*};
 use std::ops::{Add, Mul};
 

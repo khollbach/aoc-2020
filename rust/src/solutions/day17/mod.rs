@@ -1,4 +1,4 @@
-use super::Res;
+use crate::Res;
 use point::{Point, Point3, Point4};
 use std::collections::HashSet;
 use std::io::{self, prelude::*};
