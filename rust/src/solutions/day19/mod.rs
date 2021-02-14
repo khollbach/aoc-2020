@@ -12,7 +12,10 @@ pub fn main() -> Res<()> {
     let queries = &lines[blank + 1..];
 
     let dag = parse_dag(rules.iter().map(String::as_str));
-    dbg!(rules.len(), queries.len(), dag.upper_bound());
+    let accepted = dag.compute_accepted_set();
+
+    let num_valid = queries.iter().filter(|&q| accepted.contains(q)).count();
+    println!("{}", num_valid);
 
     Ok(())
 }
