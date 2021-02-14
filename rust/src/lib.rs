@@ -27,7 +27,7 @@ pub fn solution(day: u32) -> Res<()> {
         16 => day16::main(),
         17 => day17::main(),
         18 => day18::main(),
-        //19 => day19::main(),
+        19 => day19::main(),
         //20 => day20::main(),
         //21 => day21::main(),
         //22 => day22::main(),
