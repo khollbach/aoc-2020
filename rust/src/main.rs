@@ -8,7 +8,7 @@ fn main() -> Res<()> {
     let args: Vec<_> = args.collect();
 
     let usage = || {
-        print_usage(&prog_name);
+        eprint_usage(&prog_name);
         process::exit(1)
     };
 
@@ -32,8 +32,8 @@ fn main() -> Res<()> {
     aoc_2020::solution(day)
 }
 
-fn print_usage(prog_name: &str) {
-    println!(
+fn eprint_usage(prog_name: &str) {
+    eprintln!(
         "usage: `{} <num>`\nwhere <num> is a number from 1 through 25",
         prog_name
     );
