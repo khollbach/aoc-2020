@@ -83,16 +83,16 @@ where
 fn part1(graph: &HashMap<TileId, Vec<TileId>>) -> u64 {
     // Each corners is adjacent to exactly 2 tiles.
     let mut corners = vec![];
-    for (t, edges) in graph {
+    for (&id, edges) in graph {
         let num_adj = edges.len();
         assert!(2 <= num_adj && num_adj <= 4);
         if num_adj == 2 {
-            corners.push(t);
+            corners.push(id);
         }
     }
 
     assert_eq!(corners.len(), 4, "{:?}", corners);
-    corners.into_iter().map(|t| t.0 as u64).product()
+    corners.into_iter().map(|id| id.0 as u64).product()
 }
 
 fn part2(tiles: &mut HashMap<TileId, Tile>, graph: &Graph) -> usize {
