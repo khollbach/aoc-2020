@@ -3,6 +3,9 @@ use tile::{Tile, TileId};
 use std::collections::{HashMap, HashSet};
 use std::io::{self, prelude::*};
 use std::hash::Hash;
+use tile::border::Direction::{Left, Right, Up, Down, self};
+use crate::solutions::day20::tile::border::{Border, DIRS};
+use crate::solutions::day20::tile::Pixel;
 
 mod tile;
 mod input;
@@ -19,6 +22,13 @@ Part 1:
 - loop over tiles,
     - count degrees
     - spit out the 4 tiles with degree 2
+
+Part 2:
+- flip each tile so that they're all "upright" and the borders line up.
+- stitch them together to form an image
+- find a sea monster (any orientation)
+- use the orientation of the sea monster to re-orient the image
+- count the number of non-sea monster tiles
 
  */
 
@@ -96,95 +106,81 @@ fn part1(graph: &HashMap<TileId, Vec<TileId>>) -> u64 {
 }
 
 fn part2(tiles: &mut HashMap<TileId, Tile>, graph: &Graph) -> usize {
-    // orient_tiles(tiles, graph);
+    orient_tiles(tiles, graph);
 
-    // let image = fuse_image(&tiles);
+    let image = fuse_image(tiles, graph);
 
-    // todo: count monsters in image
+    // count monsters in image
+
     todo!()
 }
 
-// fn orient_tiles(tiles: &mut HashMap<TileId, Tile>, graph: &Graph) {
-//     let mut to_visit = vec![];
-//     let mut seen = HashSet::new();
-//
-//     let first = tiles.keys().next().unwrap();
-//     to_visit.push((first, Top, first.border(Top)));
-//     seen.insert(first);
-//
-//     while let Some((tile, dir, border)) = to_visit.pop() {
-//         //correct_orientation(tiles, tile, dir, border); todo!
-//
-//         for &dir in &DIRS {
-//             let border = tile.border(dir);
-//             let other = todo!(); // find_match(edges, tile, border);
-//             if !seen.contains(&other) {
-//                 to_visit.push((other, dir.opposite(), border));
-//             }
-//         }
-//     }
-//
-//     assert_eq!(seen.len(), tiles.len());
-// }
+/// Flip and/or rotate each tile so that they're all "face up" and the borders line up.
+fn orient_tiles(tiles: &mut HashMap<TileId, Tile>, graph: &Graph) {
+    let n = tiles.len();
+    assert_eq!(graph.len(), n);
 
-// /// Flip tile so that its `dir` border equals `border`.
-// fn correct_orientation(tiles, tile_id, dir, border) {
-//     let tile = tiles[tile_id];
-//
-//     if !tile.borders().contains(&border) {
-//         tile.flip();
-//     }
-//     assert!(tile.borders().contains(&border));
-//
-//     let curr_dir = tile.borders().index_of(border).unwrap();
-//     let rotation = dir.difference(curr_dir);
-//     tile.rotate(rotation);
-// }
+    let mut to_visit = Vec::with_capacity(n);
+    let mut seen = HashSet::with_capacity(n);
 
-// /// Counter-clockwise.
-// #[derive(Clone, Copy)]
-// enum Rotation {
-//     R0,
-//     R90,
-//     R180,
-//     R270,
-// }
-//
-// impl Direction {
-//     fn opposite(self) -> Self {
-//         match self {
-//             Top => Bottom,
-//             Bottom => Top,
-//             Right => Left,
-//             Left => Right,
-//         }
-//     }
-//
-//     fn difference(self, other: Self) -> Rotation {
-//         Rotation::turns_ccw((self as u32 - other as u32) % 4)
-//     }
-// }
-//
-// impl Rotation {
-//     fn turns_ccw(num_turns: u32) -> Rotation {
-//         assert!(num_turns < 4);
-//         match num_turns {
-//             0 => R0,
-//             1 => R90,
-//             2 => R180,
-//             3 => R270,
-//             _ => unreachable!(),
-//         }
-//     }
-// }
-//
-// impl Tile {
-//     fn rotate(&mut self, dir: Direction) {
-//         todo!()
-//     }
-//
-//     fn flip(&mut self) {
-//         todo!()
-//     }
-// }
-//
+    let first = match tiles.keys().next() {
+        Some(&t) => t,
+        None => return,
+    };
+    seen.insert(first);
+    to_visit.push((first, Up, tiles[&first].border(Up)));
+
+    while let Some((id, dir, border)) = to_visit.pop() {
+        orient_tile(tiles, id, dir, border);
+
+        let curr_tile = &tiles[&id];
+        let neighbors = &graph[&id];
+
+        for &dir in &DIRS {
+            let border = curr_tile.border(dir);
+            if let Some(&neighbor) = neighbors.iter().find(|&t| tiles[t].has_border(border)) {
+                if !seen.contains(&neighbor) {
+                    seen.insert(neighbor);
+                    to_visit.push((neighbor, dir.flip(), border));
+                }
+            }
+        }
+    }
+
+    // The graph must be connected.
+    assert_eq!(seen.len(), n);
+}
+
+/// Flip and/or rotate this tile.
+///
+/// After orienting, the tile's border in direction `dir` should equal the target `border`.
+///
+/// Panics if this is impossible.
+fn orient_tile(tiles: &mut HashMap<TileId, Tile>, id: TileId, dir: Direction, border: Border) {
+    let tile = tiles.get_mut(&id).unwrap();
+
+    // Flip.
+    if !tile.has_border(border) {
+        tile.flip();
+    }
+    assert!(tile.has_border(border));
+
+    // Rotate.
+    while tile.border(dir) != border {
+        tile.rotate_ccw();
+    }
+}
+
+/// Fuse the image into one big virtual "tile", by stripping borders and gluing tiles together.
+///
+/// Warning: don't treat the output like a normal tile. It doesn't have an id in the `tiles` collection,
+/// it's the wrong size, etc.
+fn fuse_image(tiles: &HashMap<TileId, Tile>, graph: &Graph) -> Tile {
+    // find the top-left tile, using a method similar to part 1, but also checking which of its nbrs are non-none.
+
+    // traverse the graph row-by-row, I guess?
+    // fill in a matrix of the appropriate size as you go
+
+    // return it :)
+    todo!()
+}

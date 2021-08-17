@@ -51,7 +51,18 @@ pub enum Direction {
     Down,
 }
 
-const DIRS: [Direction; 4] = [Up, Right, Down, Left];
+impl Direction {
+    pub fn flip(self) -> Direction {
+        match self {
+            Up => Down,
+            Down => Up,
+            Left => Right,
+            Right => Left,
+        }
+    }
+}
+
+pub const DIRS: [Direction; 4] = [Up, Right, Down, Left];
 
 impl Tile {
     /// This tile's 4 borders, in any order.
@@ -63,7 +74,7 @@ impl Tile {
     ///
     /// This is important, so that we can check equality of two side-by-side borders.
     /// E.g. the right border of a tile versus the left border of the tile next to it.
-    fn border(&self, dir: Direction) -> Border {
+    pub fn border(&self, dir: Direction) -> Border {
         let n = self.pixels.len();
         match dir {
             Up => Border::new((0..n).map(|i| self.pixels[0][i])),
@@ -71,6 +82,14 @@ impl Tile {
             Left => Border::new((0..n).map(|i| self.pixels[i][0])),
             Right => Border::new((0..n).map(|i| self.pixels[i][n - 1])),
         }
+    }
+
+    /// Does this tile have the given border?
+    ///
+    /// NOTE: we consider only the 4 face-up borders, and not their mirrored versions.
+    pub fn has_border(&self, border: Border) -> bool {
+        let borders: Vec<_> = self.borders().collect();
+        borders.contains(&border)
     }
 }
 
