@@ -86,10 +86,10 @@ impl Tile {
 
     /// Does this tile have the given border?
     ///
-    /// NOTE: we consider only the 4 face-up borders, and not their mirrored versions.
+    /// We normalize so that it doesn't matter if the tile is "face up" or "face down".
     pub fn has_border(&self, border: Border) -> bool {
-        let borders: Vec<_> = self.borders().collect();
-        borders.contains(&border)
+        let normalized = border.normalize();
+        self.borders().any(|b| b.normalize() == normalized)
     }
 }
 

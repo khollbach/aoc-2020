@@ -1,6 +1,6 @@
 use crate::Res;
 use tile::{Tile, TileId};
-use std::collections::{HashMap, HashSet};
+use std::collections::{HashMap, HashSet, VecDeque};
 use std::io::{self, prelude::*};
 use std::hash::Hash;
 use tile::border::Direction::{Left, Right, Up, Down, self};
@@ -115,13 +115,14 @@ fn part2(tiles: &mut HashMap<TileId, Tile>, graph: &Graph) -> usize {
     todo!()
 }
 
-/// Flip and/or rotate each tile so that they're all "face up" and the borders line up.
+/// Flip and/or rotate each tile so that they're all "face up" (or all "face down")
+/// and the borders line up.
 fn orient_tiles(tiles: &mut HashMap<TileId, Tile>, graph: &Graph) {
     let n = tiles.len();
     assert_eq!(graph.len(), n);
 
-    let mut to_visit = Vec::with_capacity(n);
     let mut seen = HashSet::with_capacity(n);
+    let mut to_visit = Vec::with_capacity(n);
 
     let first = match tiles.keys().next() {
         Some(&t) => t,
@@ -148,7 +149,7 @@ fn orient_tiles(tiles: &mut HashMap<TileId, Tile>, graph: &Graph) {
     }
 
     // The graph must be connected.
-    assert_eq!(seen.len(), n);
+    assert_eq!(seen.len(), n, "Graph is disconnected, or there's a bug in our code.");
 }
 
 /// Flip and/or rotate this tile.
@@ -158,29 +159,66 @@ fn orient_tiles(tiles: &mut HashMap<TileId, Tile>, graph: &Graph) {
 /// Panics if this is impossible.
 fn orient_tile(tiles: &mut HashMap<TileId, Tile>, id: TileId, dir: Direction, border: Border) {
     let tile = tiles.get_mut(&id).unwrap();
+    assert!(tile.has_border(border), "Tile doesn't have border.\n{:?}\n{:?}", tile, border);
 
-    // Flip.
-    if !tile.has_border(border) {
-        tile.flip();
-    }
-    assert!(tile.has_border(border));
-
-    // Rotate.
-    while tile.border(dir) != border {
+    for _ in 0..4 {
+        if tile.border(dir) == border { return; }
         tile.rotate_ccw();
     }
+
+    tile.flip();
+
+    for _ in 0..4 {
+        if tile.border(dir) == border { return; }
+        tile.rotate_ccw();
+    }
+
+    panic!(
+        "Tile doesn't have border. Possibly a bug in one of the helper functions.\n\
+        {:?}\n{:?}",
+        tile, border
+    );
 }
 
 /// Fuse the image into one big virtual "tile", by stripping borders and gluing tiles together.
 ///
-/// Warning: don't treat the output like a normal tile. It doesn't have an id in the `tiles` collection,
+/// Warning: don't treat the output like a normal tile. E.g., it doesn't have an id in the `tiles` collection,
 /// it's the wrong size, etc.
 fn fuse_image(tiles: &HashMap<TileId, Tile>, graph: &Graph) -> Tile {
-    // find the top-left tile, using a method similar to part 1, but also checking which of its nbrs are non-none.
+    let top_left = top_left_corner(tiles, graph);
 
     // traverse the graph row-by-row, I guess?
     // fill in a matrix of the appropriate size as you go
+    /// I'm thinking of moving graph into a class,
+    /// with both the tiles and the edges.
+    ///
+    /// This class can have methods for getting the tile below a tile, etc.
+    ///
+    /// This let us refactor the common code from orienting, and fusing the image.
+    todo!();
 
     // return it :)
     todo!()
+}
+
+/// Helper for `fuse_image`.
+///
+/// Finds a tile that has exactly two neighbors; one below it, and one to the right of it.
+fn top_left_corner(tiles: &HashMap<TileId, Tile>, graph: &Graph) -> TileId {
+    for (&id, tile) in tiles {
+        let neighbors = &graph[&id];
+
+        if neighbors.len() == 2 {
+            let bottom = tile.border(Down);
+            let right = tile.border(Right);
+
+            if neighbors.iter().any(|t| tiles[t].has_border(bottom)) &&
+                neighbors.iter().any(|t| tiles[t].has_border(right))
+            {
+                return id;
+            }
+        }
+    }
+
+    panic!("No top-left corner. Perhaps tiles weren't oriented first?");
 }
