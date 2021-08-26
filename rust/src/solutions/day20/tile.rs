@@ -6,6 +6,7 @@ pub mod border;
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct TileId(pub u32);
 
+#[derive(Clone)]
 pub struct Tile {
     pub id: TileId,
     pub pixels: Vec<Vec<Pixel>>,

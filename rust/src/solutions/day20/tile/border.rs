@@ -1,7 +1,7 @@
 use std::fmt;
+use std::cmp::min;
 use Direction::{Down, Up, Right, Left};
 use super::Pixel::{Black, White, self};
-use std::cmp::min;
 use super::Tile;
 
 /// A bitmask representing the pattern of pixels on a border.
