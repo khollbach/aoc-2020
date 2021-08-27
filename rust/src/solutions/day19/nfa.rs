@@ -1,12 +1,13 @@
-//! Code to represent the input DAG for Day 19.
+//! Code to represent the NFA for Day 19.
 
-pub mod parse;
-
-use std::collections::HashMap;
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 use std::iter;
+use new_nfa::parse_rules;
 
-pub struct Dag {
+mod new_nfa;
+
+/// Non-deterministic Finite Automaton representing the given list of rules.
+pub struct Nfa {
     root: Label,
     nodes: HashMap<Label, Node>,
 }
@@ -25,8 +26,13 @@ enum Node {
     },
 }
 
-impl Dag {
+impl Nfa {
+    pub fn new<'a>(rules: impl Iterator<Item = &'a str>) -> Self {
+        parse_rules(rules)
+    }
+
     /// Compute an upper bound on the size of the accepted set of this DAG.
+    #[allow(unused)]
     pub fn upper_bound(&self) -> usize {
         let mut memo = HashMap::new();
         self.ub_helper(self.root, &mut memo)
@@ -61,7 +67,7 @@ impl Dag {
         memo.remove(&self.root).unwrap()
     }
 
-    /// Recusively compute the accepted set for this label; update `memo` accordingly.
+    /// Recursively compute the accepted set for this label; update `memo` accordingly.
     ///
     /// Helper for `compute_accepted_set`.
     fn accepted_helper(&self, label: Label, memo: &mut HashMap<Label, HashSet<String>>) {
@@ -84,7 +90,7 @@ impl Dag {
         memo.insert(label, accepted);
     }
 
-    /// Recusively compute the accepted set for each label in a group.
+    /// Recursively compute the accepted set for each label in a group.
     ///
     /// Helper for `accepted_helper`.
     fn accepted_sets<'a>(
