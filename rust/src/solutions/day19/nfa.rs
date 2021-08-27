@@ -12,6 +12,7 @@ pub struct Nfa {
     nodes: HashMap<Label, Node>,
 }
 
+/// The unique id of a state in the NFA.
 #[derive(Debug, Copy, Clone, Hash, Eq, PartialEq)]
 struct Label(u32);
 
@@ -31,7 +32,7 @@ impl Nfa {
         parse_rules(rules)
     }
 
-    /// Compute an upper bound on the size of the accepted set of this DAG.
+    /// Compute an upper bound on the size of the accepted set of this NFA.
     #[allow(unused)]
     pub fn upper_bound(&self) -> usize {
         let mut memo = HashMap::new();
@@ -60,7 +61,7 @@ impl Nfa {
         size
     }
 
-    /// Compute the accepted set for this DAG. Likely expensive!
+    /// Compute the accepted set for this NFA. Likely expensive!
     pub fn compute_accepted_set(&self) -> HashSet<String> {
         let mut memo = HashMap::new();
         self.accepted_helper(self.root, &mut memo);
