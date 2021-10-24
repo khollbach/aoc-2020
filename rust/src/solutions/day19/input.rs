@@ -16,7 +16,7 @@ pub struct Input<'a> {
     pub queries: &'a [String],
 }
 
-/// Helper for `read_input`.
+/// Helper function for `read_input`.
 fn first_blank_line(lines: &[String]) -> Option<usize> {
     for (i, line) in lines.iter().enumerate() {
         if line.trim() == "" {
