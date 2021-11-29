@@ -32,7 +32,7 @@ pub fn solution(day: u32) -> Res<()> {
         21 => day21::main(),
         22 => day22::main(),
         23 => day23::main(),
-        //24 => day24::main(),
+        24 => day24::main(),
         //25 => day25::main(),
         _ => Err(format!("Not yet implemented: day {}", day).into()),
     }
