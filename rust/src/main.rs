@@ -1,4 +1,4 @@
-use aoc_2020::{self, Res};
+use aoc_2020::Res;
 use std::env;
 use std::process;
 
